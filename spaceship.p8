@@ -1,7 +1,55 @@
 pico-8 cartridge // http://www.pico-8.com
 version 14
 __lua__
+-- rect
 
+shipx    = 20
+shipy    = 80
+shipw    = 10
+shiph    = 8 
+shipp    = 80
+floory   = 95
+-- ship jump
+jumpdir  = 0
+j_spd    = 3
+jumph    = 50
+
+function jump()
+		if(jumpdir == 0) then
+			jumpdir -= j_spd
+		end
+end
+
+function move()
+	shipy += jumpdir
+	if(shipy <	jumph) then
+		jumpdir *= -1 
+	elseif(shipy > shipp) then
+		jumpdir = 0
+		shipy = shipp
+	end
+end
+
+
+function _update()
+	
+end
+
+function _draw()
+	--screen
+	rectfill(0,0,128,128,0)
+	--ship
+	if(btn(2)) then
+		jump()
+	end
+	if(jumpdir != 0) then
+		move()
+	end
+	spr(0,shipx,shipy,3,2)
+	--floor
+	rectfill(0,floory,128,90,4)
+	
+end 
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
