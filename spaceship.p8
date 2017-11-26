@@ -10,9 +10,12 @@ function _init()
  							}
 	bullets = {}
 	enemies = {}
+	explosions = {}
+	boss = {} -- et
 	t  = 0
 	bc = 1
 	i = 0
+	bss = 0
 	start()
 end
 
@@ -34,6 +37,7 @@ function reset()
 		mset(8,7,82)
 		_init()
 end
+
 function fire (i,sprite,dix,diy)
  local	bullet = {
 		sp = sprite,
@@ -49,6 +53,10 @@ function fire (i,sprite,dix,diy)
 	sfx(0)
 end
 
+function explosion(x,y)
+	add(explosions,{x=x,y=y,tem = 0})
+end
+
 function spawn (sprite,sx,sy,dix,diy)
 	local enemy = {
 		sp  = sprite,
@@ -61,6 +69,19 @@ function spawn (sprite,sx,sy,dix,diy)
 		box = {x1=0,y1=0,x2=3,y2=3}
 		}
 	add(enemies,enemy)
+end
+
+function spawnboss(x,y,dix,diy)
+	local et = {
+			x = x,
+			y=y,
+			dx = dix,
+			dy = diy,
+			hp = 3,
+			box = {x1=0,y1=0,x2=3,y2=3}
+		}
+	add(boss,et)
+	bss = 0
 end
 
 -- colisoes
@@ -103,11 +124,35 @@ function update_mgame()
 				for enemy in all(enemies) do
 					if coll(bullet,enemy) then
 						del(enemies,enemy)
+						explosion(enemy.x+3,enemy.y+3)
 						del(bullets,bullet)
 						fort.points += 10
 						bc=1
      end
 				end
+				for et in all(boss) do
+					if coll(bullet,et) then
+						if(et.hp != 0) then
+							et.hp -= 1
+							explosion(et.x+3,et.y+3)
+							explosion(et.x-3,et.y+3)
+							explosion(et.x-3,et.y+3)
+						else
+							del(boss,et)
+							explosion(et.x,et.y)
+							del(bullets,bullet)
+							fort.points += 100
+							bc = 1
+						end
+					end
+				end
+		end
+		
+		for explosion in all(explosions) do
+  explosion.tem+=1
+  	if explosion.tem == 13 then
+   	del(explosions, explosion)
+  	end
 		end
 
   if btnp(0) and bc == 1 then fire(0,22,-3,0) end
@@ -131,10 +176,30 @@ function update_mgame()
 			end
 		end
 	end
-		if t%100 == 0 then spawn(12,0,fort.y,0.9,0) end
-		if t%125 == 0 then spawn(10,fort.x,0,0,1.5) end
-		if t%150 == 0 then spawn(12,128,fort.y,-2,0) end
-		if t%185 == 0 then spawn(10,fort.x,128,0,-0.5) end
+		if t%100 == 0 and bss == 0 then spawn(12,0,fort.y,0.9,0) end
+		if t%125 == 0 and bss == 0 then spawn(10,fort.x,0,0,1.5) end
+		if t%150 == 0 and bss == 0 then spawn(12,128,fort.y,-2,0) end
+		if t%185 == 0 and bss == 0 then spawn(10,fort.x,128,0,-0.5) end
+		if bss == 1 then spawnboss(128,fort.y,-0.5,0) end                           
+	
+	for et in all(boss) do
+		et.x += et.dx
+		et.y += et.dy
+		if coll(fort,et) then
+			del(boss,et)
+			if(fort.hp > 1) then
+				fort.hp -= 1
+			else
+				gameover()
+			end
+		end
+	end
+	
+	if fort.points != 0 and  fort.points % 300 == 0 then
+		fort.hp +=1
+		bss = 1
+		fort.points += 10
+	end
 end
 
 --function _draw_title()
@@ -144,10 +209,16 @@ end
 
 function draw_mgame()
 	cls()
+	
 	map(0,0,0,0,17,16)
-	if(fort.hp == 2) then
-		mset(7,6,98)
-		mset(8,6,97)
+	if(fort.hp > 3) then
+		mset(7,6,65)
+		mset(8,6,66)
+		mset(7,7,81)
+		mset(8,7,82)
+	elseif(fort.hp == 2) then
+		mset(7,6,97)
+		mset(8,6,98)
 		mset(7,7,113)
 		mset(8,7,114)
 	elseif(fort.hp == 1) then
@@ -167,7 +238,15 @@ function draw_mgame()
 	print(fort.points,25,0,2)
 	print("health:",90,0,1)
 	print(fort.hp,120,0,2)
+	for explosion in all(explosions) do
+		 circ(explosion.x,explosion.y,explosion.tem/2,8+explosion.tem%3)
+	end
+	
+	for et in all(boss) do
+		spr(206,et.x,et.y,2,2)
+	end
 end
+
 
 function draw_gameover()
 	cls()
