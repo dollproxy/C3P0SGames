@@ -2,8 +2,10 @@ pico-8 cartridge // http://www.pico-8.com
 version 14
 __lua__
 function _init()
- fort = {x = 64, y = 64}
+ fort = {x = 60, y = 50}
 	bullets = {}
+	enemies = {}
+	t = 0
 end
 
 function fire (i,sprite,dix,diy)
@@ -18,18 +20,42 @@ function fire (i,sprite,dix,diy)
 	add(bullets,bullet)
 end
 
-function _update()
+function spawn (sprite,sx,sy,dix,diy)
+	local enemy = {
+		sp = sprite,
+		x  = sx,
+		y  = sy,
+		dx = dix,
+		dy = diy
+		}
+	add(enemies,enemy)
+end
 
+function _update()
+	t += 1
+-- bullet  control
 		for bullet in all(bullets) do
 				bullet.x += bullet.dx
 				bullet.y += bullet.dy
+				if bullet.x < 0 or bullet.x > 128 or bullet.y < 0 or bullet.y > 128 then
+					del(bullets,bullet)
+				end
 		end
 
-  if btn(0) then fire(0,22,-3,0) end
-		if btn(1) then fire(1,19,3,0) end
-		if btn(2) then fire(2,20,0,-3) end
-		if btn(3) then fire(3,21,0,3) end
-
+  if btnp(0) then fire(0,22,-3,0) end
+		if btnp(1) then fire(1,19,3,0) end
+		if btnp(2) then fire(2,20,0,-3) end
+		if btnp(3) then fire(3,21,0,3) end
+-- enemy spawn 
+	for enemy in all(enemies) do
+		enemy.x += enemy.dx
+		enemy.y += enemy.dy
+		if enemy.x > fort.x then
+			del(enemies,enemy)
+		end
+	end
+		if t%100 == 0 then spawn(14,0,fort.y,3,0) end
+	
 end
 
 function _draw() 
@@ -37,6 +63,9 @@ function _draw()
 	map(0,0,0,0,17,16)
 	for bullet in all(bullets) do
 		spr(bullet.sp,bullet.x,bullet.y)
+	end
+	for enemy in all(enemies) do
+		spr(enemy.sp,enemy.x,enemy.y)
 	end
 end
 
