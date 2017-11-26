@@ -78,7 +78,7 @@ function spawnboss(x,y,dix,diy)
 			y=y,
 			dx = dix,
 			dy = diy,
-			hp = 3,
+			hp = 4,
 			box = {x1=0,y1=0,x2=3,y2=3}
 		}
 	add(boss,et)
