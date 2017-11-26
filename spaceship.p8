@@ -261,11 +261,16 @@ function draw_gameover()
 		mset(8,6,104)
 		mset(7,7,119)
 		mset(8,7,120)
-	else
+	elseif i >= 60 and i < 90 then 
 		mset(7,6,105)
 		mset(8,6,106)
 		mset(7,7,121)
 		mset(8,7,122)
+	else
+		mset (7,6, 107)
+		mset (8,6,108)
+		mset (7,7, 123)
+		mset (8,7, 124)	
 	end
 	i += 1
 	print("game over",45,70,2)
