@@ -21,6 +21,18 @@ function start()
 	_update = update_mgame
 end
 
+function gameover()
+	_draw = draw_gameover
+	_update = update_gameover
+end
+
+function reset()
+		mset(7,6,65)
+		mset(8,6,66)
+		mset(7,7,81)
+		mset(8,7,82)
+		_init()
+end
 function fire (i,sprite,dix,diy)
  local	bullet = {
 		sp = sprite, 
@@ -104,8 +116,10 @@ function update_mgame()
 		enemy.y += enemy.dy
 		if coll(fort,enemy) then
 			del(enemies,enemy)
-			if(fort.hp > 0) then
+			if(fort.hp > 1) then
 				fort.hp -= 1
+			else
+				gameover()
 			end
 		end
 	end
@@ -135,8 +149,21 @@ function draw_mgame()
 	print(fort.hp,120,0,2)
 end
 
+function draw_gameover()
+	cls()
+	map(0,0,0,0,17,16)
+	mset(7,6,99)
+	mset(8,6,100)
+	mset(7,7,115)
+	mset(8,7,116)
+	print("game over",45,70,2)
+	print("press — to continue",25,80,2)
+	end
 
-
+function update_gameover()
+	if btnp(5) then reset()
+	end
+end
 	
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000004444440000000000000000000000000000000000000000000000000
