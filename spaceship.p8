@@ -5,11 +5,20 @@ function _init()
  fort = {x = 60,
  							 y = 50,
  							 points = 0,
+ 							 hp	= 3,
  							 box = {x1=0,y1=0,x2=10,y2=10}
  							}
 	bullets = {}
 	enemies = {}
-	t = 0
+	t  = 0
+	bc = 1
+	start()
+end
+
+--states
+function start()
+	_draw = draw_mgame
+	_update = update_mgame
 end
 
 function fire (i,sprite,dix,diy)
@@ -23,6 +32,7 @@ function fire (i,sprite,dix,diy)
 		box = {x1 = 0, y1 = 0,x2=3,y2=3}
 	}
 	add(bullets,bullet)
+	bc = 0
 end
 
 function spawn (sprite,sx,sy,dix,diy)
@@ -64,7 +74,7 @@ function coll(ba,bb)
 	return true
 end
 
-function _update()
+function update_mgame()
 	t += 1
 -- bullet  control
 		for bullet in all(bullets) do
@@ -72,26 +82,31 @@ function _update()
 				bullet.y += bullet.dy
 				if bullet.x < 0 or bullet.x > 128 or bullet.y < 0 or bullet.y > 128 then
 					del(bullets,bullet)
+					bc = 1
 				end
 				for enemy in all(enemies) do
 					if coll(bullet,enemy) then
 						del(enemies,enemy)
 						del(bullets,bullet)
 						fort.points += 10
+						bc=1
      end
 				end
 		end
 
-  if btnp(0) then fire(0,22,-3,0) end
-		if btnp(1) then fire(1,19,3,0) end
-		if btnp(2) then fire(2,20,0,-3) end
-		if btnp(3) then fire(3,21,0,3) end
+  if btnp(0) and bc == 1 then fire(0,22,-3,0) end
+		if btnp(1) and bc == 1 then fire(1,19,3,0) end
+		if btnp(2) and bc == 1 then fire(2,20,0,-3) end
+		if btnp(3) and bc == 1 then fire(3,21,0,3) end
 -- enemy spawn 
 	for enemy in all(enemies) do
 		enemy.x += enemy.dx
 		enemy.y += enemy.dy
 		if coll(fort,enemy) then
 			del(enemies,enemy)
+			if(fort.hp > 0) then
+				fort.hp -= 1
+			end
 		end
 	end
 		if t%100 == 0 then spawn(14,0,fort.y,0.9,0) end
@@ -100,7 +115,12 @@ function _update()
 		if t%185 == 0 then spawn(15,fort.x,128,0,-0.5) end
 end
 
-function _draw() 
+--function _draw_title()
+--	cls()
+--	print("we've been discovered!",30,30,2)
+--end
+	
+function draw_mgame() 
 	cls()
 	map(0,0,0,0,17,16)
 	for bullet in all(bullets) do
@@ -111,6 +131,8 @@ function _draw()
 	end
 	print("score:",0,0,1)
 	print(fort.points,25,0,2)
+	print("health:",90,0,1)
+	print(fort.hp,120,0,2)
 end
 
 
