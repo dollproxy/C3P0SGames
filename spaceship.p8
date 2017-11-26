@@ -4,7 +4,8 @@ __lua__
 function _init()
  fort = {x = 60,
  							 y = 50,
- 							 box = {x1=0,y1=0,x2=16,x3=16}
+ 							 points = 0,
+ 							 box = {x1=0,y1=0,x2=10,y2=10}
  							}
 	bullets = {}
 	enemies = {}
@@ -76,6 +77,7 @@ function _update()
 					if coll(bullet,enemy) then
 						del(enemies,enemy)
 						del(bullets,bullet)
+						fort.points += 10
      end
 				end
 		end
@@ -88,12 +90,14 @@ function _update()
 	for enemy in all(enemies) do
 		enemy.x += enemy.dx
 		enemy.y += enemy.dy
-		if enemy.x > fort.x then
+		if coll(fort,enemy) then
 			del(enemies,enemy)
 		end
 	end
-		if t%100 == 0 then spawn(14,0,fort.y,3,0) end
-	
+		if t%100 == 0 then spawn(14,0,fort.y,0.9,0) end
+		if t%125 == 0 then spawn(15,fort.x,0,0,1.5) end
+		if t%150 == 0 then spawn(14,128,fort.y,-2,0) end
+		if t%185 == 0 then spawn(15,fort.x,128,0,-0.5) end
 end
 
 function _draw() 
@@ -105,6 +109,8 @@ function _draw()
 	for enemy in all(enemies) do
 		spr(enemy.sp,enemy.x,enemy.y)
 	end
+	print("score:",0,0,1)
+	print(fort.points,25,0,2)
 end
 
 
