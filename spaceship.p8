@@ -12,6 +12,7 @@ function _init()
 	enemies = {}
 	t  = 0
 	bc = 1
+	i = 0
 	start()
 end
 
@@ -50,12 +51,14 @@ end
 
 function spawn (sprite,sx,sy,dix,diy)
 	local enemy = {
-		sp = sprite,
-		x  = sx,
-		y  = sy,
-		dx = dix,
-		dy = diy,
-		box= {x1=0,y1=0,x2=3,y2=3}
+		sp  = sprite,
+		sp2 = sprite + 16,
+		ani = 1,
+		x   = sx,
+		y   = sy,
+		dx  = dix,
+		dy  = diy,
+		box = {x1=0,y1=0,x2=3,y2=3}
 		}
 	add(enemies,enemy)
 end
@@ -115,6 +118,10 @@ function update_mgame()
 	for enemy in all(enemies) do
 		enemy.x += enemy.dx
 		enemy.y += enemy.dy
+		enemy.ani += 1
+		if enemy.ani == 30 then
+			enemy.ani = 0
+		end
 		if coll(fort,enemy) then
 			del(enemies,enemy)
 			if(fort.hp > 1) then
@@ -125,9 +132,9 @@ function update_mgame()
 		end
 	end
 		if t%100 == 0 then spawn(12,0,fort.y,0.9,0) end
-		if t%125 == 0 then spawn(11,fort.x,0,0,1.5) end
+		if t%125 == 0 then spawn(10,fort.x,0,0,1.5) end
 		if t%150 == 0 then spawn(12,128,fort.y,-2,0) end
-		if t%185 == 0 then spawn(11,fort.x,128,0,-0.5) end
+		if t%185 == 0 then spawn(10,fort.x,128,0,-0.5) end
 end
 
 --function _draw_title()
@@ -138,11 +145,23 @@ end
 function draw_mgame()
 	cls()
 	map(0,0,0,0,17,16)
+	if(fort.hp == 2) then
+		mset(7,6,98)
+		mset(8,6,97)
+		mset(7,7,113)
+		mset(8,7,114)
+	elseif(fort.hp == 1) then
+		mset(7,6,99)
+		mset(8,6,100)
+		mset(7,7,115)
+		mset(8,7,116)
+	end
 	for bullet in all(bullets) do
 		spr(bullet.sp,bullet.x,bullet.y)
 	end
 	for enemy in all(enemies) do
-		spr(enemy.sp,enemy.x,enemy.y)
+	 if enemy.ani <= 15 then	spr(enemy.sp,enemy.x,enemy.y) 
+	 elseif enemy.ani > 15 then  spr(enemy.sp2,enemy.x,enemy.y) end
 	end
 	print("score:",0,0,1)
 	print(fort.points,25,0,2)
@@ -153,10 +172,23 @@ end
 function draw_gameover()
 	cls()
 	map(0,0,0,0,17,16)
-	mset(7,6,99)
-	mset(8,6,100)
-	mset(7,7,115)
-	mset(8,7,116)
+	if i < 30 then
+		mset(7,6,101)
+		mset(8,6,102)
+		mset(7,7,117)
+		mset(8,7,118)
+	elseif i >= 30 and i < 60 then
+		mset(7,6,103)
+		mset(8,6,104)
+		mset(7,7,119)
+		mset(8,7,120)
+	else
+		mset(7,6,105)
+		mset(8,6,106)
+		mset(7,7,121)
+		mset(8,7,122)
+	end
+	i += 1
 	print("game over",45,70,2)
 	print("score: " ,47,80,8)
 	print(fort.points,72,80,8)
