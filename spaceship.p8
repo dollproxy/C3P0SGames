@@ -4,7 +4,7 @@ __lua__
 function _init()
  fort = {x = 60,
  							 y = 50,
- 							 points = 0,
+ 							 points = 740,
  							 hp	= 3,
  							 box = {x1=0,y1=0,x2=10,y2=10}
  							}
@@ -16,6 +16,7 @@ function _init()
 	bc = 1
 	i = 0
 	bss = 0
+	bs2 = 0
 	menu()
 end
 
@@ -77,17 +78,19 @@ function spawn (sprite,sx,sy,dix,diy)
 	add(enemies,enemy)
 end
 
-function spawnboss(x,y,dix,diy)
+function spawnboss(x,y,dix,diy,sp)
 	local et = {
 			x = x,
 			y=y,
 			dx = dix,
 			dy = diy,
+			spri = sp,
 			hp = 4,
 			box = {x1=0,y1=0,x2=3,y2=3}
 		}
 	add(boss,et)
 	bss = 0
+	bs2 = 0
 end
 
 -- colisoes
@@ -190,8 +193,8 @@ function update_mgame()
 		if t%125 == 0 and bss == 0 then spawn(rnd(8)+7,fort.x,0,0,1.5) end
 		if t%150 == 0 and bss == 0 then spawn(rnd(8)+7,128,fort.y,-2,0) end
 		if t%185 == 0 and bss == 0 then spawn(rnd(8)+7,fort.x,128,0,-0.5) end
-		if bss == 1 then spawnboss(128,fort.y,-0.5,0) end
-
+		if bss == 1 then spawnboss(128,fort.y,-0.5,0,206) end
+  if bs2 == 1 then spawnboss(0,fort.y,0.5,0,204) end        
 	for et in all(boss) do
 		et.x += et.dx
 		et.y += et.dy
@@ -211,6 +214,9 @@ function update_mgame()
 		fort.hp +=1
 		bss = 1
 		fort.points += 10
+	end
+	if fort.points!= 0 and fort.points % 750 == 0 then
+		bs2 = 1
 	end
 end
 
@@ -267,8 +273,8 @@ function draw_mgame()
 	end
 
 	for et in all(boss) do
-		spr(206,et.x,et.y,2,2)
-	end
+		spr(et.spri,et.x,et.y,2,2)	
+end
 end
 
 
